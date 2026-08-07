@@ -101,7 +101,7 @@ jobs:
         json: true
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: snyk-analysis
         path: snyk.json
@@ -129,7 +129,7 @@ jobs:
       run: mvn -q -B -DskipTests package
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: popshop-artifact
         path: target/popshop-0.1.0.jar
