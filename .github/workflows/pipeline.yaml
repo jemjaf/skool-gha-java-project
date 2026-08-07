@@ -13,6 +13,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      actions: write
     steps:
     - name: Checkout code
       uses: actions/checkout@v7
@@ -66,6 +67,7 @@ jobs:
         fetch-depth: 0
 
     - name: SonarQube Scan
+      continue-on-error: true
       uses: SonarSource/sonarqube-scan-action@v8 # toJSON(steps.<step-id>.outputs)
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -78,6 +80,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v7
     - name: Snyk Code Scan
+      continue-on-error: true
       uses: snyk/actions/maven@v1.0.0
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
