@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: popshop
+
+app:
+  version: '@project.version@'
+  description: 'App Hello World de PopShop (de3skool, @jemjaf) para practicar CI/CD con GitHub Actions.'
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+    build:
+      enabled: true
+
+info:
+  app:
+    name: PopShop
+    version: '@project.version@'
+    description: 'App Hello World de PopShop, lista para integrarse a pipelines de CI/CD.'
+    academia: 'de3skool (@jemjaf)'
+
+logging:
+  level:
+    root: INFO
+    com.de3skool.popshop: INFO
