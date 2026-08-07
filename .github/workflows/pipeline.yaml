@@ -75,8 +75,13 @@ jobs:
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-    - name: Show SonarQube Scan Results
-      run: echo ${{ toJSON(steps.sonar-analysis.outputs) }}
+    - name: SonarQube Quality Gate
+      id: sonar-quality-gate
+      uses: sonarsource/sonarqube-quality-gate-action@v1
+      with:
+        pollingTimeoutSec: 60
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 
   snyk-analysis:
@@ -92,14 +97,20 @@ jobs:
       uses: snyk/actions/maven@v1.0.0
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        json: true
 
-    - name: Show Snyk Code Scan Results
-      run: echo ${{ toJSON(steps.snyk-analysis.outputs) }}
-
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: snyk-analysis
+        path: snyk.json
 
   publish-artifacts:
     runs-on: ubuntu-latest
     if: ${{ github.event.pull_request.merged == true }}
+    outputs:
+      ar-name: ${{ steps.artifact-name.outputs.ar-name }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v7
@@ -122,6 +133,10 @@ jobs:
       with:
         name: popshop-artifact
         path: target/popshop-0.1.0.jar
+
+    - name: Artifactory name
+      id: artifact-name
+      run: echo "ar-name=popshop-artifact-${{ github.sha }}" >> $GITHUB_OUTPUT
     
   consolidation-job:
     if: ${{ github.event.pull_request.merged == true }}
@@ -130,3 +145,12 @@ jobs:
     steps:
     - name: Reporte Final
       run: echo "El pipeline ha finalizado correctamente"
+
+    - name: "Echo Artifact Name"
+      run: echo "Artifact Name ${{ needs.publish-artifacts.outputs.ar-name }}"
+    
+    - name: Download Artifact Snyk
+      uses: actions/download-artifact@v8
+      with:
+        name: snyk-analysis
+        path: snyk.json
